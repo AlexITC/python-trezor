@@ -21,6 +21,7 @@
 # along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
 import base64
+import binascii
 import json
 import os
 import sys
@@ -1823,19 +1824,14 @@ def ontology_sign_ont_id_add_attributes(
 
 
 @cli.command(help="Sign transaction input using address of given path.")
-@click.option("-c", "--coin", default="Bitcoin")
 @click.option(
     "-n", "--address", required=True, help="BIP-32 path, e.g. m/44'/0'/0'/0/0"
 )
-@click.option(
-    "-t",
-    "--script-type",
-    type=click.Choice(["address", "segwit", "p2shsegwit"]),
-    default="address",
-)
 @click.argument("tx_input")
 @click.pass_obj
-def sign_tx_input(connect, coin, address, tx_input, script_type):
+def sign_tx_input(connect, address, tx_input):
+    script_type = "address"
+    coin = "Stakenet"
     client = connect()
     address_n = tools.parse_path(address)
     typemap = {
@@ -1848,8 +1844,9 @@ def sign_tx_input(connect, coin, address, tx_input, script_type):
     return {
         "tx_input": tx_input,
         "address": res.address,
-        "signature": base64.b64encode(res.signature),
+        "signature": binascii.b2a_hex(res.signature),
     }
+
 #
 # Main
 #
