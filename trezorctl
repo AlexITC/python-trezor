@@ -903,6 +903,18 @@ def sign_tx(connect, coin):
             )
         )
 
+    click.echo()
+    tpos_contract = click.prompt("TPoS contract (if any)", default="")
+    if (tpos_contract):
+        outputs.append(
+            proto.TxOutputType(
+                op_return_data=binascii.a2b_hex(tpos_contract),
+                amount=0,
+                script_type=3
+            )
+        )
+
+
     signtx = proto.SignTx()
     signtx.version = click.prompt("Transaction version", type=int, default=2)
     signtx.lock_time = click.prompt("Transaction locktime", type=int, default=0)
@@ -1839,6 +1851,7 @@ def sign_tx_input(connect, address, tx_input):
         "segwit": proto.InputScriptType.SPENDWITNESS,
         "p2shsegwit": proto.InputScriptType.SPENDP2SHWITNESS,
     }
+    # TODO: Replace with CHOICE_INPUT_SCRIPT_TYPE[script_type]
     script_type = typemap[script_type]
     res = btc.sign_tx_input(client, coin, address_n, tx_input, script_type)
     return {
